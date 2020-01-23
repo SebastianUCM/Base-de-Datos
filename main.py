@@ -1,9 +1,14 @@
-from flask import Flask, render_template, url_for
+from flask import Flask, render_template, url_for, request, redirect, session, flash
+import cx_Oracle
 app = Flask(__name__)
+app.config["SECRET_KEY"] = '4495d60fb193c77b54e891a4fe200e7e'
 
-@app.route("/")
+@app.route("/", methods=["POST","GET"]) #vista de la página principal - registro
 def inicio():
-    return render_template("inicio.html")
+    if "usuario" in session:
+        return redirect(url_for("paises"))
+    else:
+        return render_template("inicio.html")
 
 @app.route("/Inicio_Sesion")
 def inicio_sesion():
@@ -81,9 +86,18 @@ def aeropuerto():
 def ciudad():
     return render_template("ciudad.html")
 
-@app.route("/Pais")
+@app.route("/Pais", methods=["GET"]) #Vista de los Paises
 def pais():
     return render_template("pais.html")
+
+def conectar_bdd():
+    try:    
+        servidor = cx_Oracle.makedsn('localhost', '1521', service_name='xe') 
+        conexion = cx_Oracle.connect(user='AVIONES', password='AVIONES', dsn = servidor) 
+        return conexion
+    except cx_Oracle.DatabaseError as e:
+        error = e.args[0]
+        return False
 
 if __name__ == "__main__":
     app.run(debug=True)

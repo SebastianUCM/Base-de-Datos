@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Vista de inicio</title>
+    <title>Vista Paises</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
     <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
   </head>
@@ -13,68 +13,69 @@
     <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm">
   <h5 class="my-0 mr-md-auto font-weight-normal">Compañia</h5>
   <nav class="my-2 my-md-0 mr-md-3">
-    <a class="p-2 text-dark" href="#">Features</a>
+    <a class="p-2 text-dark" href="/">Features</a>
     <a class="p-2 text-dark" href="#">Enterprise</a>
     <a class="p-2 text-dark" href="#">Support</a>
     <a class="p-2 text-dark" href="#">Pricing</a>
   </nav>
-  <a class="btn btn-outline-primary" href="#">Sign up</a>
+  <a class="btn btn-outline-primary" href="Inicio_Sesion">Iniciar Sesion</a>
 </div>
 
 <div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
-  <h1 class="display-4">Pagina de Inicio</h1>
-  <p class="lead">Quickly build an effective pricing table for your potential customers with this Bootstrap example. It’s built with default Bootstrap components and utilities with little customization.</p>
+  <h1 class="display-4">Paises</h1>
 </div>
 
-<div class="container">
-  <div class="card-deck mb-3 text-center">
-    <div class="card mb-4 shadow-sm">
-      <div class="card-header">
-        <h4 class="my-0 font-weight-normal">Free</h4>
-      </div>
-      <div class="card-body">
-        <h1 class="card-title pricing-card-title">$0 <small class="text-muted">/ mo</small></h1>
-        <ul class="list-unstyled mt-3 mb-4">
-          <li>10 users included</li>
-          <li>2 GB of storage</li>
-          <li>Email support</li>
-          <li>Help center access</li>
-        </ul>
-        <button type="button" class="btn btn-lg btn-block btn-outline-primary">Sign up for free</button>
-      </div>
-    </div>
-    <div class="card mb-4 shadow-sm">
-      <div class="card-header">
-        <h4 class="my-0 font-weight-normal">Pro</h4>
-      </div>
-      <div class="card-body">
-        <h1 class="card-title pricing-card-title">$15 <small class="text-muted">/ mo</small></h1>
-        <ul class="list-unstyled mt-3 mb-4">
-          <li>20 users included</li>
-          <li>10 GB of storage</li>
-          <li>Priority email support</li>
-          <li>Help center access</li>
-        </ul>
-        <button type="button" class="btn btn-lg btn-block btn-primary">Get started</button>
-      </div>
-    </div>
-    <div class="card mb-4 shadow-sm">
-      <div class="card-header">
-        <h4 class="my-0 font-weight-normal">Enterprise</h4>
-      </div>
-      <div class="card-body">
-        <h1 class="card-title pricing-card-title">$29 <small class="text-muted">/ mo</small></h1>
-        <ul class="list-unstyled mt-3 mb-4">
-          <li>30 users included</li>
-          <li>15 GB of storage</li>
-          <li>Phone and email support</li>
-          <li>Help center access</li>
-        </ul>
-        <button type="button" class="btn btn-lg btn-block btn-primary">Contact us</button>
-      </div>
-    </div>
-  </div>
-
+    <div class="container">
+      <!--  {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+              {% for category, message in messages %}
+                {% if category == "success" %}
+                <div class="alert alert-success"> <strong>¡Excelente!</strong> {{ message }}</div>
+                {% else %}
+                <div class="alert alert-danger"> <strong>¡Oh rayos!</strong> {{ message }}</div>
+                {% endif %}
+              {% endfor %}
+            {% endif %}
+        {% endwith %}
+        {% if session["usuario"] %}
+            {% if productos|length > 0 %}
+         -->   <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Código Pais</th>
+                        <th scope="col">Nombre Pais</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for producto in productos %}
+                    <tr>
+                        <td>{{ producto[0] }}</td>
+                        <td>{{ producto[1] }}</td>
+                        <td>{{ producto[2] }}</td>
+                        <td>{{ producto[3] }}</td>
+                        <td>{{ producto[4] }}</td>
+                        <td>
+                            <form action="{{ url_for('modificar_producto') }}" method="POST">
+                                <button class="btn btn-success btn-block" type="submit" name="modificar_producto" id="modificar_producto" value="{{ producto[0] }}">Modificar</button>
+                            </form>
+                            <form action="{{ url_for('eliminar_producto') }}" method="POST">
+                                <button class="btn btn-danger btn-block" type="submit" name="eliminar_producto" id="eliminar_producto" value="{{ producto[0] }}">Eliminar</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+      <!--      {% else %}
+                <div class="alert alert-info"> <strong>¡Atención!</strong> Al parecer aún no ingresas ningún producto</div>
+            {% endif %}
+        {% else %}
+            <div class="alert alert-info"> <strong>¡Atención!</strong> Debe iniciar sesión como administrador para modificar los paises</div>
+        {% endif %}
+        {% if session["usuario"] %}
+        <a type="button" class="btn btn-success" href="{{ url_for('insertar_producto') }}">Agregar Producto</a>
+        {% endif %}
+-->
   <footer class="pt-4 my-md-5 pt-md-5 border-top">
     <div class="row">
       <div class="col-12 col-md">
