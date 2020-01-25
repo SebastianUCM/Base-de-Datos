@@ -10,9 +10,35 @@ def inicio():
     else:
         return render_template("inicio.html")
 
-@app.route("/Inicio_Sesion")
+@app.route("/Inicio_Sesion", methods=["POST","GET"]) #vista inicio sesion
 def inicio_sesion():
-    return render_template("inicio_sesion.html")
+    if request.method == "POST":
+        CLIENTE = dict()
+        CLIENTE["EMAIL"] = request.form['email_usuario']
+        CLIENTE["CONTRASENA"] = request.form['contrasena_usuario']
+        conexion = conectar_bdd()
+        if conexion != False:
+            sentencia = conexion.cursor()
+            resultado = sentencia.var(cx_Oracle.STRING) 
+            mensaje = sentencia.var(cx_Oracle.STRING)
+            sentencia.callproc("INICIAR_SESION",(CLIENTE["EMAIL"], CLIENTE["CONTRASENA"], resultado, mensaje))
+            sentencia.close()
+            if resultado.getvalue() == "TRUE":
+                session["CLIENTE"] = CLIENTE["EMAIL"]
+                flash(mensaje.getvalue(), "success")
+            else:
+                flash(mensaje.getvalue(), "danger")
+        else:
+            flash("No se pudo realizar la conexion", "danger")
+        return redirect(url_for("inicio_sesion"))
+    else:
+        return render_template("inicio_sesion.html")
+
+@app.route("/cerrar_sesion")
+def cerrar_sesion():
+    if session["CLIENTE"]:
+        session.pop("CLIENTE", None)
+    return redirect(url_for("inicio"))
 
 @app.route("/Registro")
 def registro():
@@ -97,6 +123,7 @@ def conectar_bdd():
         return conexion
     except cx_Oracle.DatabaseError as e:
         error = e.args[0]
+        print(error)
         return False
 
 if __name__ == "__main__":
