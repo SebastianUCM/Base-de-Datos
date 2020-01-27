@@ -34,15 +34,37 @@ def inicio_sesion():
     else:
         return render_template("inicio_sesion.html")
 
+
+@app.route("/Registro", methods=["POST","GET"])
+def registro():
+    if request.method == "POST":
+        CLIENTE = dict()
+        CLIENTE["NOMBRE"] = request.form["nombre_usuario"]
+        CLIENTE["APELLIDO"] = request.form["apellido_usuario"]
+        CLIENTE["EMAIL"] = request.form["email_usuario"]
+        CLIENTE["CONTRASENA"] = request.form["contrasena_usuario"]
+        conexion = conectar_bdd()
+        if conexion != False:
+            sentencia = conexion.cursor()
+            resultado = sentencia.var(cx_Oracle.STRING) 
+            mensaje = sentencia.var(cx_Oracle.STRING)
+            sentencia.callproc("INGRESAR_CLIENTE_REGISTRO",(CLIENTE["NOMBRE"], CLIENTE["APELLIDO"], CLIENTE["EMAIL"], CLIENTE["CONTRASENA"], resultado, mensaje))
+            sentencia.close()
+            if resultado.getvalue() == "TRUE":
+                flash(mensaje.getvalue(), "success")
+            else:
+                flash(mensaje.getvalue(), "danger")
+        else:
+            flash("No se pudo realizar la conexion", "danger")
+        return render_template("inicio.html")
+    else:  
+        return render_template("registro.html")
+
 @app.route("/cerrar_sesion")
 def cerrar_sesion():
     if session["CLIENTE"]:
         session.pop("CLIENTE", None)
     return redirect(url_for("inicio"))
-
-@app.route("/Registro")
-def registro():
-    return render_template("registro.html")
 
 @app.route("/Avion")
 def avion():
