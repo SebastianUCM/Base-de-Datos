@@ -64,6 +64,76 @@ def registro():
     else:  
         return render_template("registro.html")
 
+@app.route("/Perfil", methods=["POST","GET"]) # Vista Perfil
+def perfil():
+    if request.method == "POST":
+        CLIENTE = dict()
+        CLIENTE["NOMBRE"] = request.form['nombre_usuario']
+        CLIENTE["APELLIDO"] = request.form['apellido_usuario']
+        CLIENTE["FECHA_NACIMIENTO"] = request.form['f_na_usuario']
+        CLIENTE["GENERO"] = request.form['genero_usuario']
+        CLIENTE["TIPO_DOCUMENTO"] = request.form['t_doc_usuario']
+        CLIENTE["FECHA_VENCIMIENTO_DOCUMENTO"] = request.form['f_v_doc__usuario']
+        CLIENTE["NUMERO_DOCUMENTO"] = request.form['n_doc_usuario']
+        CLIENTE["NACIONALIDAD"] = request.form['nacionalidad_usuario']
+        CLIENTE["PAIS"] = request.form['pais_usuario']
+        CLIENTE["TELEFONO"] = request.form['telefono_usuario']
+        CLIENTE["EMAIL"] = request.form['email_usuario']
+        CLIENTE["CONTRASENA"] = request.form['contrasena_usuario']
+        conexion = conectar_bdd("AVIONES","AVIONES")
+        if conexion != False:
+            sentencia = conexion.cursor()
+            resultado = sentencia.var(cx_Oracle.STRING) 
+            mensaje = sentencia.var(cx_Oracle.STRING)
+            #TIPO = sentencia.var(cx_Oracle.STRING)
+            sentencia.callproc("AVIONES.ACTUALIZA_CLIENTE",(CLIENTE["NOMBRE"], CLIENTE["APELLIDO"], CLIENTE["FECHA_NACIMIENTO"], CLIENTE["GENERO"], CLIENTE["TIPO_DOCUMENTO"], CLIENTE["FECHA_VENCIMIENTO_DOCUMENTO"], CLIENTE["NUMERO_DOCUMENTO"], CLIENTE["NACIONALIDAD"], CLIENTE["PAIS"], CLIENTE["TELEFONO"], CLIENTE["EMAIL"], CLIENTE["CONTRASENA"], resultado, mensaje))
+            sentencia.close()
+            if resultado.getvalue() == "TRUE":
+                session["CLIENTE"] = CLIENTE["EMAIL"]
+                #session["TIPO"] = TIPO.getvalue()
+                print(session["CLIENTE"])
+                #print(session["TIPO"])
+                flash(mensaje.getvalue(), "success")
+            else:
+                flash(mensaje.getvalue(), "danger")
+        else:
+            flash("No se pudo realizar la conexion", "danger")
+        return redirect(url_for("perfil"))
+    else:
+        return render_template("perfil.html")
+
+@app.route("/Administra_Vuelo", methods=["POST","GET"])
+def administra_vuelo():
+    if request.method == 'POST':
+        AVION = dict()
+        AVION['ID_AVION'] = request.form['codigo_avion']
+        conexion = conectar_bdd("AVIONES","AVIONES")
+        if conexion != False:
+            sentencia = conexion.cursor()
+            sentencia.prepare('select * from AVIONES.AVION where ID_AVION = :codigo_avion')
+            sentencia.execute(None, {'codigo_avion': (AVION['ID_AVION'])})
+            AV = []
+            for fila in sentencia:
+                for elem in fila:
+                    AV.append(elem)
+            AV[4] = '2'+AV[4]
+            print(AV)
+            return render_template('Administra_Vuelo.html')
+        else:
+            return redirect('inicio')
+    else:
+        return redirect('inicio')
+
+
+
+
+
+        conexion = conectar_bdd("AVIONES","AVIONES")
+        return render_template("administra_vuelo.html")
+    else:  
+        return render_template("administra_vuelo.html")
+    return render_template("administra_vuelo.html")
+
 @app.route("/cerrar_sesion")
 def cerrar_sesion():
     if session["CLIENTE"]:

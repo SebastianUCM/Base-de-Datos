@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Vista de Perfil</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+</head>
+
+<body>
+    <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm">
+        <h5 class="my-0 mr-md-auto font-weight-normal"><a href="{{ url_for('inicio') }}">Compañía</a></h5>
+       <!-- <nav class="my-2 my-md-0 mr-md-3">
+            <a class="p-2 text-dark" href="{{ url_for('pais') }}">Pais</a>
+        </nav> -->
+        {% if not session["CLIENTE"] %}
+        <a class="btn btn-outline-primary" href="{{ url_for('registro') }}">Registrarse</a>
+        {% endif %}
+        {% if session["CLIENTE"] %}
+        <a class="btn btn-outline-danger" style="margin-left: 10px;" href="{{ url_for('cerrar_sesion') }}">Cerrar Sesión</a>
+        {% else %}
+        <a class="btn btn-outline-success" style="margin-left: 10px;" href="{{ url_for('inicio_sesion') }}">Iniciar Sesión</a>
+        {% endif %}
+    </div>
+
+    <div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+        <h1 class="display-4">Información Personal</h1>
+    </div>
+
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+              {% for category, message in messages %}
+                {% if category == "success" %}
+                <div class="alert alert-success"> <strong>¡Excelente!</strong> {{ message }}</div>
+                {% else %}
+                <div class="alert alert-danger"> <strong>¡Oh rayos!</strong> {{ message }}</div>
+                {% endif %}
+              {% endfor %}
+            {% endif %}
+        {% endwith %}
+        <form action="{{ url_for('perfil') }}" method="POST">
+            <div class="form-group">
+
+                    <label for="nombre_usuario">Nombre</label>
+                    <input type="text" class="form-control" name="nombre_usuario" id="nombre_usuario" placeholder="Ingrese su Nombre">
+                </div>
+            
+                <div class="form-group">
+                    <label for="apellido_usuario">Apellido</label>
+                    <input type="text" class="form-control" name="apellido_usuario" id="apellido_usuario" placeholder="Ingrese su Apellido">
+              
+            </div>
+
+            <div class="form-group">
+                <label for="f_na_usuario">Fecha de Nacimiento</label>
+                <input type="text" class="form-control" name="f_na_usuario" id="f_na_usuario" placeholder="Ingrese Fecha de Nacimiento">
+            </div>
+
+            <div class="form-group">
+                <label for="genero_usuario">Genero</label>
+                <input type="text" class="form-control" name="genero_usuario" id="genero_usuario" placeholder="Genero">
+            </div>
+            
+            <div class="form-group">
+                <label for="t_doc_usuario">Tipo de Documento</label>
+                <input type="text" class="form-control" name="t_doc_usuario" id="t_doc_usuario" placeholder="Ingrese Tipo de Documento">
+            </div>
+
+            <div class="form-group">
+                <label for="f_v_doc__usuario">Fecha de Vencimiento de Documento</label>
+                <input type="text" class="form-control" name="f_v_doc__usuario" id="f_v_doc__usuario" placeholder="Caducidad de su Documento">
+            </div>
+
+            <div class="form-group">
+                <label for="n_doc_usuario">Número de Documento</label>
+                <input type="text" class="form-control" name="n_doc_usuario" id="n_doc_usuario" placeholder="Ingrese su Numero de Documento">
+            </div>
+            
+            <div class="form-group">
+                <label for="nacionalidad_usuario">Nacionalidad</label>
+                <input type="text" class="form-control" name="nacionalidad_usuario" id="nacionalidad_usuario" placeholder="Nacionalidad">
+            </div>
+
+            <div class="form-group">
+                <label for="pais_usuario">Pais</label>
+                <input type="text" class="form-control" name="pais_usuario" id="pais_usuario" placeholder="Ingrese su País de Origen">
+            </div>
+
+            <div class="form-group">
+                <label for="telefono_usuario">Telefono</label>
+                <input type="text" class="form-control" name="telefono_usuario" id="telefono_usuario" placeholder="Ingrese su Numero Telefonico">
+            </div>
+            
+            <div class="form-group">
+                <label for="email_usuario">Email</label>
+                <input type="text" class="form-control" name="email_usuario" id="email_usuario" placeholder="Ingrese su Correo Electronico">
+            </div>
+
+            <div class="form-group">
+                <label for="contrasena_usuario">Contraseña</label>
+                <input type="password" class="form-control" name="contrasena_usuario" id="contrasena_usuario" placeholder="Ingrese su Contraseña">
+            </div>
+
+            <button type="submit" class="btn btn-success">Actualizar Datos</button>
+        </form>
+        <footer class="pt-4 my-md-5 pt-md-5 border-top">
+            <div class="row">
+                <div class="col-12 col-md">
+                    <img class="mb-2" src="/docs/4.4/assets/brand/bootstrap-solid.svg" alt="" width="24" height="24">
+                    <small class="d-block mb-3 text-muted">&copy; Base de datos - 2020</small>
+                </div>                
+            </div>
+        </footer>
+    </div>
+</body>
+
+</html>
