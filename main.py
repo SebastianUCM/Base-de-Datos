@@ -123,16 +123,11 @@ def administra_vuelo():
             return redirect('inicio')
     else:
         return redirect('inicio')
-
-
-
-
-
-        conexion = conectar_bdd("AVIONES","AVIONES")
-        return render_template("administra_vuelo.html")
-    else:  
-        return render_template("administra_vuelo.html")
-    return render_template("administra_vuelo.html")
+#        conexion = conectar_bdd("AVIONES","AVIONES")
+#        return render_template("administra_vuelo.html")
+#    else:  
+#        return render_template("administra_vuelo.html")
+#    return render_template("administra_vuelo.html")
 
 @app.route("/cerrar_sesion")
 def cerrar_sesion():
