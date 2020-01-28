@@ -6,25 +6,29 @@ app.config["SECRET_KEY"] = '4495d60fb193c77b54e891a4fe200e7e'
 @app.route("/", methods=["POST","GET"]) #vista de la página principal - registro
 def inicio():
     if "usuario" in session:
-        return redirect(url_for("paises"))
+        return redirect(url_for("inicio"))
     else:
         return render_template("inicio.html")
 
-@app.route("/Inicio_Sesion", methods=["POST","GET"]) #vista inicio sesion
+@app.route("/inicio_Sesion", methods=["POST","GET"]) #vista inicio sesion
 def inicio_sesion():
     if request.method == "POST":
         CLIENTE = dict()
         CLIENTE["EMAIL"] = request.form['email_usuario']
         CLIENTE["CONTRASENA"] = request.form['contrasena_usuario']
-        conexion = conectar_bdd()
+        conexion = conectar_bdd("AVIONES_CLIENTE","123")
         if conexion != False:
             sentencia = conexion.cursor()
             resultado = sentencia.var(cx_Oracle.STRING) 
             mensaje = sentencia.var(cx_Oracle.STRING)
-            sentencia.callproc("INICIAR_SESION",(CLIENTE["EMAIL"], CLIENTE["CONTRASENA"], resultado, mensaje))
+            TIPO = sentencia.var(cx_Oracle.STRING)
+            sentencia.callproc("AVIONES.INICIAR_SESION",(CLIENTE["EMAIL"], CLIENTE["CONTRASENA"], resultado, mensaje, TIPO))
             sentencia.close()
             if resultado.getvalue() == "TRUE":
                 session["CLIENTE"] = CLIENTE["EMAIL"]
+                session["TIPO"] = TIPO.getvalue()
+                print(session["CLIENTE"])
+                print(session["TIPO"])
                 flash(mensaje.getvalue(), "success")
             else:
                 flash(mensaje.getvalue(), "danger")
@@ -43,7 +47,7 @@ def registro():
         CLIENTE["APELLIDO"] = request.form["apellido_usuario"]
         CLIENTE["EMAIL"] = request.form["email_usuario"]
         CLIENTE["CONTRASENA"] = request.form["contrasena_usuario"]
-        conexion = conectar_bdd()
+        conexion = conectar_bdd("AVIONES","AVIONES")
         if conexion != False:
             sentencia = conexion.cursor()
             resultado = sentencia.var(cx_Oracle.STRING) 
@@ -56,7 +60,7 @@ def registro():
                 flash(mensaje.getvalue(), "danger")
         else:
             flash("No se pudo realizar la conexion", "danger")
-        return render_template("inicio.html")
+        return render_template("registro.html")
     else:  
         return render_template("registro.html")
 
@@ -64,6 +68,7 @@ def registro():
 def cerrar_sesion():
     if session["CLIENTE"]:
         session.pop("CLIENTE", None)
+        session.pop("TIPO", None)
     return redirect(url_for("inicio"))
 
 @app.route("/Avion")
@@ -134,14 +139,35 @@ def aeropuerto():
 def ciudad():
     return render_template("ciudad.html")
 
-@app.route("/Pais", methods=["GET"]) #Vista de los Paises
-def pais():
-    return render_template("pais.html")
+#@app.route("/Pais", methods=["GET"]) #Vista de los Paises
+#def pais():
+#    return render_template("pais.html")
 
-def conectar_bdd():
+
+@app.route("/Pais", methods=["GET"]) #vista de los productos
+def pais():
+    if "CLIENTE" in session:
+        email_usuario = session["CLIENTE"]
+        conexion = conectar_bdd()
+        if conexion != False:
+            sentencia = conexion.cursor()
+            sentencia.execute("SELECT * FROM pais")
+            #sentencia.execute(None, {'EMAIL': email_usuario})
+            pais = []
+            for fila in sentencia: #Para ver cada fila, hay que recorrer la lista una por una
+                pais.append(fila)      #Imprimimos cada fila
+                sentencia.close()  #Cerramos la conexión
+            return render_template("pais.html")
+        else:
+            flash("No se pudo realizar la conexion", "danger")
+            return redirect(url_for("pais"))
+    else:
+        return redirect(url_for("pais"))
+
+def conectar_bdd(user,passw):
     try:    
         servidor = cx_Oracle.makedsn('localhost', '1521', service_name='xe') 
-        conexion = cx_Oracle.connect(user='AVIONES', password='AVIONES', dsn = servidor) 
+        conexion = cx_Oracle.connect(user, passw, dsn = servidor) 
         return conexion
     except cx_Oracle.DatabaseError as e:
         error = e.args[0]
