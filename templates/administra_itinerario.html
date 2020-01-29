@@ -4,40 +4,42 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Vista de inicio</title>
+    <title>Vista Administrador Itineraio</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
     <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
-  
-<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-  <!-- Bootstrap CSS -->
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
   </head>
 
   <body>
     <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm">
         <h5 class="my-0 mr-md-auto font-weight-normal"><a href="{{ url_for('inicio') }}">Compañía</a></h5>
-        {% if session["TIPO"] == "ADMIN" %}
+        
+         {% if session["TIPO"] == "ADMIN" %}
         <nav class="my-2 my-md-0 mr-md-3">
-            <a class="p-2 text-dark" href="{{ url_for('administra_itinerario') }}">Administra Itinerario</a>
+            <a class="p-2 text-dark" href="#">Origen</a>
+        </nav>  
+        <nav class="my-2 my-md-0 mr-md-3">
+            <a class="p-2 text-dark" href="#">Destino</a>
+        </nav>  
         </nav> 
         <nav class="my-2 my-md-0 mr-md-3">
-            <a class="p-2 text-dark" href="{{ url_for('perfil') }}">Perfil</a>
+            <a class="p-2 text-dark" href="#">Aeropuerto</a>
         </nav>  
         <nav class="my-2 my-md-0 mr-md-3">
-            <a class="p-2 text-dark" href="{{ url_for('cliente') }}">Clientes</a>
+            <a class="p-2 text-dark" href="#">Ciudad</a>
         </nav>  
-        {% endif %}
+        </nav> 
+        <nav class="my-2 my-md-0 mr-md-3">
+            <a class="p-2 text-dark" href="#">País</a>
+        </nav>  
 
-        {% if session["TIPO"] == "NORMAL" %}
-        <nav class="my-2 my-md-0 mr-md-3">
-            <a class="p-2 text-dark" href="{{ url_for('perfil') }}">Perfil</a>
-        </nav>  
         {% endif %}
         {% if not session["CLIENTE"] %}
         <a class="btn btn-outline-primary" href="{{ url_for('registro') }}">Registrarse</a>
         {% endif %}
+
         {% if session["CLIENTE"] %}
         <a class="btn btn-outline-danger" style="margin-left: 10px;" href="{{ url_for('cerrar_sesion') }}">Cerrar Sesión</a>
         {% else %}
@@ -46,21 +48,7 @@
     </div>
 
     <div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
-  
-        
-        <h1 class="display-4">Inicio</h1>
-        <p class="lead">Esta es la Pagina de Inicio</p>
-        {% if session["CLIENTE"]%}
-            {% if session["TIPO"] == "ADMIN" %}
-                <p class="lead">ADMINISTRADOR</p>
-            {% else %}
-                {% if session["TIPO"] == "NORMAL" %}
-                    <p class="lead">USUARIO NORMAL</p>
-                {% else %}
-                    <p class="lead">VISITANTE</p>
-                {% endif %}    
-            {% endif %}
-        {% endif %}
+        <h1 class="display-4">Administra Itinerario</h1>
     </div>
 
     <div class="container">

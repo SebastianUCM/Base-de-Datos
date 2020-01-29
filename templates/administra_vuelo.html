@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Vista de inicio</title>
+    <title>Vista Administación Aviones</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
     <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
   </head>
@@ -12,6 +12,7 @@
   <body>
     <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm">
         <h5 class="my-0 mr-md-auto font-weight-normal"><a href="{{ url_for('inicio') }}">Compañía</a></h5>
+
         {% if not session["CLIENTE"] %}
         <a class="btn btn-outline-primary" href="{{ url_for('registro') }}">Registrarse</a>
         {% endif %}
@@ -37,6 +38,40 @@
             {% endif %}
         {% endif %}
     </div>
+
+    <form action="{{ url_for('administra_vuelo') }}" method="POST">
+        <div class="form-group">
+            <label for="codigo_producto">Código producto</label>
+            <input type="number" class="form-control" name="codigo_producto" id="codigo_producto" placeholder="Ingrese el código del producto">
+        </div>
+        <div class="form-group">
+            <label for="nombre_producto">Nombre producto</label>
+            <input type="text" class="form-control" name="nombre_producto" id="nombre_producto" placeholder="Ingrese el nombre del producto">
+        </div>
+        <div class="form-group">
+            <label for="precio_producto">Precio</label>
+            <input type="number" class="form-control" name="precio_producto" id="precio_producto" placeholder="Ingrese el precio del producto">
+        </div>
+        <div class="form-group">
+                <label for="categoria_producto">Categoría</label>
+                <select class="form-control" name="categoria_producto" id="categoria_producto">
+                    <option value="">Seleccione una categoría</option>
+                    {% for fila in categorias %}
+                        <option value="{{ fila[0] }}">{{ fila[1] }}</option>
+                    <!-- Cargar categorías disponibles desde la base de datos -->
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="stock_producto">Stock</label>
+                <input type="number" class="form-control" name="stock_producto" id="stock_producto" placeholder="Ingrese el stock del producto">
+            </div>
+            {% if categorias|length > 0 %}
+                <button type="submit" class="btn btn-primary">Guardar</button>
+            {% else %}
+                <button type="submit" class="btn btn-primary" disabled>Guardar</button>
+            {% endif %}
+        </form>
 
     <div class="container">
         <footer class="pt-4 my-md-5 pt-md-5 border-top">
