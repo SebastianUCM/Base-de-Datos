@@ -136,14 +136,6 @@ def administra_vuelo():
             flash("No se pudo realizar la conexion", "danger")
         return redirect(url_for("productos"))
 
-@app.route("/Avion")
-def avion():
-    return render_template("avion.html")
-
-@app.route("/Boleta")
-def boleta():
-    return render_template("boleta.html")
-
 @app.route("/Cliente")
 def cliente():
     if request.method == "GET":
@@ -162,7 +154,6 @@ def cliente():
             return redirect(url_for("cliente"))
     else:
         return render_template("cliente.html")
-
 
 @app.route("/modifica_rol_cliente", methods=["POST","GET"]) #vista modificar producto
 def modifica_rol_cliente():
@@ -244,6 +235,175 @@ def eliminar_cliente():
     else:
         return redirect(url_for("cliente"))
 
+@app.route("/Aeropuerto")
+def aeropuerto():
+    if request.method == "GET":
+        conexion = conectar_bdd("AVIONES","AVIONES")
+        if conexion != False:
+            sentencia = conexion.cursor()
+            sentencia.prepare("SELECT ID_AEROPUERTO, DIRECCION, CIUDAD, NOMBRE FROM AEROPUERTO")
+            sentencia.execute(None)
+            aeropuertos = []
+            for fila in sentencia: #Para ver cada fila, hay que recorrer la lista una por una
+                aeropuertos.append(fila)      #Imprimimos cada fila
+            sentencia.close()  #Cerramos la conexión
+            return render_template("aeropuerto.html", aeropuertos = aeropuertos)
+        else:
+            flash("No se pudo realizar la conexion", "danger")
+            return redirect(url_for("aeropuerto"))
+    else:
+        return render_template("aeropuerto.html")
+
+@app.route("/Insertar_Aeropuerto", methods=["POST","GET"]) #vista insertar Aeropuerto
+def insertar_aerpuerto():
+    if "CLIENTE" in session:
+        if request.method == "POST":
+            AEROPUERTO = dict()
+            AEROPUERTO["ID_AEROPUERTO"] = request.form["cod_aeropuerto"]
+            AEROPUERTO["DIRECCION"] = request.form["direccion_aeropuerto"]
+            AEROPUERTO["CIUDAD"] = request.form["ciudad_aeropuerto"]
+            AEROPUERTO["NOMBRE"] = request.form["nombre_aeropuerto"]
+            conexion = conectar_bdd("AVIONES","AVIONES")
+            if conexion != False:
+                sentencia = conexion.cursor()
+                resultado = sentencia.var(cx_Oracle.STRING) 
+                mensaje = sentencia.var(cx_Oracle.STRING)
+                rut_usuario = session["usuario"]
+                sentencia.callproc("INGRESAR_AEROPUERTO", (AEROPUERTO["ID_AEROPUERTO"],AEROPUERTO["DIRECCION"],AEROPUERTO["CIUDAD"],AEROPUERTO["NOMBRE"], resultado, mensaje))
+                sentencia.close()
+                if resultado.getvalue() == "TRUE":
+                    flash(mensaje.getvalue(), "success")
+                else:
+                    flash(mensaje.getvalue(), "danger")
+                    return redirect(url_for("insertar_aerpuerto"))
+            else:
+                flash("No se pudo realizar la conexion", "danger")
+            return redirect(url_for("aeropuerto"))
+        else:
+            conexion = conectar_bdd("AVIONES","AVIONES")
+            sentencia = conexion.cursor()
+            sentencia.execute("SELECT * FROM CIUDAD")
+            ciudades = []
+            for fila in sentencia:
+                ciudades.append(fila)
+            sentencia.close()
+            return render_template("insertar_aerpuerto.html", ciudades = ciudades)
+    else:
+        return redirect(url_for("aeropuerto"))
+
+@app.route("/modificar_aeropuerto", methods=["POST","GET"]) #vista modificar Aeropuerto
+def modificar_aeropuerto():
+    if "CLIENTE" in session:
+        if request.method == "POST":
+            conexion = conectar_bdd("AVIONES","AVIONES")
+            codigo = request.form["modificar_aeropuerto"]
+            print(codigo)
+            print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+            sentencia = conexion.cursor()
+            sentencia.prepare("SELECT ID_AEROPUERTO,DIRECCION,CIUDAD,NOMBRE FROM AEROPUERTO WHERE ID_AEROPUERTO = :codigo")
+            sentencia.execute(None, {'codigo': codigo})
+            aeropuerto = None
+            for fila in sentencia:
+                aeropuerto = fila
+            return render_template("modificar_aeropuerto.html", aeropuerto = aeropuerto)
+        else:
+            return render_template("modificar_aeropuerto.html")
+    else:
+        return redirect(url_for("aeropuerto"))
+
+@app.route("/guardar_modificar_aeropuerto", methods=["POST","GET"]) #vista modificar producto
+def guardar_modificar_aeropuerto():
+    if "CLIENTE" in session:
+        if request.method == "POST":
+            AEROPUERTO = dict()
+            AEROPUERTO["ID_AEROPUERTO"] = request.form["cod_aeropuerto"]
+            AEROPUERTO["DIRECCION"] = request.form["direccion_aeropuerto"]
+            AEROPUERTO["CIUDAD"] = request.form["ciudad_aeropuerto"]
+            AEROPUERTO["NOMBRE"] = request.form["nombre_aeropuerto"]
+            conexion = conectar_bdd("AVIONES","AVIONES")
+            if conexion != False:
+                sentencia = conexion.cursor()
+                resultado = sentencia.var(cx_Oracle.STRING) 
+                mensaje = sentencia.var(cx_Oracle.STRING)
+                sentencia.callproc("ACTUALIZAR_AEROPUERTO", (AEROPUERTO["ID_AEROPUERTO"],AEROPUERTO["DIRECCION"],AEROPUERTO["CIUDAD"],AEROPUERTO["NOMBRE"], resultado, mensaje))
+                sentencia.close()
+                if resultado.getvalue() == "TRUE":
+                    flash(mensaje.getvalue(), "success")
+                else:
+                    flash(mensaje.getvalue(), "danger")
+                    return redirect(url_for("aeropuerto"))
+            else:
+                flash("No se pudo realizar la conexion", "danger")
+            return redirect(url_for("aeropuerto"))
+        else:
+            return redirect({url_for("aeropuerto")})
+    else:
+        return redirect(url_for("inicio_sesion"))
+
+@app.route("/eliminar_aeropuerto", methods=["POST","GET"]) #vista modificar AEROPUERTO
+def eliminar_aeropuerto():
+    if "CLIENTE" in session:
+        if request.method == "POST":
+            codigo = request.form["eliminar_aeropuerto"]
+            conexion = conectar_bdd("AVIONES","AVIONES")
+            if conexion != False:
+                sentencia = conexion.cursor()
+                resultado = sentencia.var(cx_Oracle.STRING) 
+                mensaje = sentencia.var(cx_Oracle.STRING)
+                sentencia.callproc("BORRAR_AEROPUERTO", (codigo, resultado, mensaje))
+                sentencia.close()
+                if resultado.getvalue() == "TRUE":
+                    flash(mensaje.getvalue(), "success")
+                else:
+                    flash(mensaje.getvalue(), "danger")
+                    return redirect(url_for("aeropuerto"))
+            else:
+                flash("No se pudo realizar la conexion", "danger")
+            return redirect(url_for("aeropuerto"))
+        else:
+            return redirect(url_for("aeropuerto"))
+    else:
+        return redirect(url_for("aeropuerto"))
+
+@app.route("/Origen")
+def origen():
+    if request.method == "GET":
+        conexion = conectar_bdd("AVIONES","AVIONES")
+        if conexion != False:
+            sentencia = conexion.cursor()
+            sentencia.prepare("SELECT ID_ORIGEN, AEROPUERTO FROM ORIGEN")
+            sentencia.execute(None)
+            origenes = []
+            for fila in sentencia: #Para ver cada fila, hay que recorrer la lista una por una
+                origenes.append(fila)      #Imprimimos cada fila
+            sentencia.close()  #Cerramos la conexión
+            return render_template("origen.html", origenes = origenes)
+        else:
+            flash("No se pudo realizar la conexion", "danger")
+            return redirect(url_for("origen"))
+    else:
+        return render_template("origen.html")
+    return render_template("origen.html")
+
+@app.route("/Destino")
+def destino():
+    if request.method == "GET":
+        conexion = conectar_bdd("AVIONES","AVIONES")
+        if conexion != False:
+            sentencia = conexion.cursor()
+            sentencia.prepare("SELECT ID_DESTINO, AEROPUERTO FROM DESTINO")
+            sentencia.execute(None)
+            destinos = []
+            for fila in sentencia: #Para ver cada fila, hay que recorrer la lista una por una
+                destinos.append(fila)      #Imprimimos cada fila
+            sentencia.close()  #Cerramos la conexión
+            return render_template("aeropuerto.html", destinos = destinos)
+        else:
+            flash("No se pudo realizar la conexion", "danger")
+            return redirect(url_for("aeropuerto"))
+    else:
+        return render_template("aeropuerto.html")    
+    return render_template("destino.html")
 
 
 
@@ -252,6 +412,17 @@ def eliminar_cliente():
 
 
 
+
+
+
+
+@app.route("/Avion")
+def avion():
+    return render_template("avion.html")
+
+@app.route("/Boleta")
+def boleta():
+    return render_template("boleta.html")
 
 @app.route("/Compañia")
 def compañia():
@@ -289,21 +460,13 @@ def pasaje():
 def itinerario():
     return render_template("itinerario.html")
 
-@app.route("/Origen")
-def origen():
-    return render_template("oreigen.html")
 
-@app.route("/Destino")
-def destino():
-    return render_template("destino.html")
 
 @app.route("/Pasajero")
 def pasajero():
     return render_template("pasajero.html")
 
-@app.route("/Aeropuerto")
-def aeropuerto():
-    return render_template("aeropuerto.html")
+
 
 @app.route("/Ciudad")
 def ciudad():

@@ -30,6 +30,8 @@
       <h1 class="display-4">Cliente</h1>
       <p class="lead">Esta es la Pagina de Clientes</p>
     </div>
+
+
     {% if session["CLIENTE"] %}
     <div class="container">
         {% with messages = get_flashed_messages(with_categories=true) %}
@@ -85,6 +87,18 @@
             {% endif %}
         </div>>
     {% endif %}
+
+
+
+
+
+
+
+
+
+
+
+
 
     <div class="container">
         <footer class="pt-4 my-md-5 pt-md-5 border-top">
