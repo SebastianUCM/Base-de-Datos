@@ -361,7 +361,6 @@ def eliminar_itinerario():
     else:
         return redirect(url_for("administra_itinerario"))
 
-
 @app.route("/modificar_aeropuerto", methods=["POST","GET"]) #vista modificar Aeropuerto
 def modificar_aeropuerto():
     if "CLIENTE" in session:
@@ -476,97 +475,331 @@ def destino():
         return render_template("destino.html")    
     return render_template("destino.html")
 
-
-
-
-
-
-
-
-
-
-
-
-@app.route("/Avion")
-def avion():
-    return render_template("avion.html")
-
-@app.route("/Boleta")
-def boleta():
-    return render_template("boleta.html")
-
-@app.route("/Compañia")
-def compañia():
-    return render_template("compañia.html")
-
-@app.route("/Detalle_Compra")
-def detalle_compra():
-    return render_template("detalle_compra.html")
-
-@app.route("/Encuesta")
-def encuesta():
-    return render_template("encuesta.html")
-
-@app.route("/Forma_Pago")
-def forma_pago():
-    return render_template("forma_pago.html")
-
-@app.route("/Vuelo")
-def vuelo():
-    return render_template("vuelo.html")
-
-@app.route("/Debito")
-def debito():
-    return render_template("debito.html")
-
-@app.route("/Credito")
-def credito():
-    return render_template("credito.html")
-
-@app.route("/Pasaje")
-def pasaje():
-    return render_template("pasaje.html")
-
-@app.route("/Itinerario")
-def itinerario():
-    return render_template("itinerario.html")
-
-
-
-@app.route("/Pasajero")
-def pasajero():
-    return render_template("pasajero.html")
-
-
-
-@app.route("/Ciudad")
+@app.route("/ciudad",methods=["POST","GET"]) #vista de los productos
 def ciudad():
-    return render_template("ciudad.html")
+        if request.method == "GET":
+            conexion = conectar_bdd("AVIONES","AVIONES")
+            if conexion != False:
+                sentencia = conexion.cursor()
+                sentencia.prepare("SELECT ID_CIUDAD,NOMBRE,PAIS FROM CIUDAD")
+                sentencia.execute(None)
+                ciudades = []
+                for fila in sentencia: #Para ver cada fila, hay que recorrer la lista una por una
+                    ciudades.append(fila)      #Imprimimos cada fila
+                sentencia.close()  #Cerramos la conexión
+                return render_template("ciudad.html", ciudades = ciudades)
+            else:
+                flash("No se pudo realizar la conexion", "danger")
+                return redirect(url_for("ciudad"))
+        else:
+            return render_template("ciudad.html")
 
-#@app.route("/Pais", methods=["GET"]) #Vista de los Paises
-#def pais():
-#    return render_template("pais.html")
-
-
-@app.route("/Pais", methods=["GET"]) #vista de los productos
-def pais():
-    if "CLIENTE" in session:
-        email_usuario = session["CLIENTE"]
-        conexion = conectar_bdd()
+@app.route('/insertar_ciudad', methods=['POST','GET'])
+def insertar_ciudad():
+    if request.method == 'POST':
+        CIUDAD= dict()
+        CIUDAD['ID_CIUDAD'] = request.form['codigo_ciudad']
+        CIUDAD['NOMBRE'] = request.form['nombre_ciudad']
+        CIUDAD['PAIS'] = request.form['id_pais']
+        conexion = conectar_bdd("AVIONES","AVIONES")
         if conexion != False:
             sentencia = conexion.cursor()
-            sentencia.execute("SELECT * FROM pais")
-            #sentencia.execute(None, {'EMAIL': email_usuario})
-            pais = []
-            for fila in sentencia: #Para ver cada fila, hay que recorrer la lista una por una
-                pais.append(fila)      #Imprimimos cada fila
-                sentencia.close()  #Cerramos la conexión
-            return render_template("pais.html")
+            resultado = sentencia.var(cx_Oracle.STRING)
+            mensaje = sentencia.var(cx_Oracle.STRING)
+            sentencia.callproc('INSERTAR_CIUDAD',(CIUDAD['ID_CIUDAD'],CIUDAD['NOMBRE'],CIUDAD['PAIS'],resultado,mensaje))
+            sentencia.close()
+            if resultado.getvalue() == 'TRUE':
+                flash(mensaje.getvalue(),'success')
+            else:
+                flash(mensaje.getvalue(),'danger')
+                return redirect(url_for("insertar_ciudad"))
+        else:
+            flash('No fue posible conectarse a la base de datos','danger')
+        return redirect(url_for('insertar_ciudad'))
+    else:
+            conexion = conectar_bdd("AVIONES","AVIONES")
+            sentencia = conexion.cursor()
+            sentencia.execute("SELECT ID_PAIS FROM PAIS")
+            paises = []
+            for fila in sentencia:
+                paises.append(fila)
+            sentencia.close()
+            return render_template("insertar_ciudad.html", paises = paises)
+
+@app.route("/actualizar_ciudad", methods=["POST","GET"]) 
+def actualizar_ciudad():
+    if request.method == "POST":
+        CIUDAD= dict()
+        CIUDAD['ID_CIUDAD'] = request.form['codigo_ciudad']
+        CIUDAD['NOMBRE'] = request.form['nombre_ciudad']
+        CIUDAD['PAIS'] = request.form['id_pais']
+        conexion = conectar_bdd("AVIONES","AVIONES")
+        if conexion != False:
+            sentencia = conexion.cursor()
+            resultado = sentencia.var(cx_Oracle.STRING) 
+            mensaje = sentencia.var(cx_Oracle.STRING)
+            TIPO = sentencia.var(cx_Oracle.STRING)
+            sentencia.callproc("ACTUALIZAR_CIUDAD",(CIUDAD['ID_CIUDAD'],CIUDAD['NOMBRE'],CIUDAD['PAIS'],resultado,mensaje))
+            sentencia.close()
+            if resultado.getvalue() == 'TRUE':
+                flash(mensaje.getvalue(),'success')
+            else:
+                flash(mensaje.getvalue(),'danger')
         else:
             flash("No se pudo realizar la conexion", "danger")
-            return redirect(url_for("pais"))
+        return redirect(url_for("actualizar_ciudad"))
     else:
-        return redirect(url_for("pais"))
+            conexion = conectar_bdd("AVIONES","AVIONES")
+            sentencia = conexion.cursor()
+            sentencia.execute("SELECT ID_PAIS FROM PAIS")
+            paises = []
+            for fila in sentencia:
+                paises.append(fila)
+            sentencia.close()
+            return render_template("actualizar_ciudad.html", paises = paises)
+
+@app.route("/eliminar_ciudad", methods=["POST","GET"]) #vista modificar CLIENTE
+def eliminar_ciudad():
+        if request.method == "POST":
+            ID_CIUDAD = request.form["eliminar_ciudad"]
+            conexion = conectar_bdd("AVIONES","AVIONES")
+            if conexion != False:
+                sentencia = conexion.cursor()
+                resultado = sentencia.var(cx_Oracle.STRING) 
+                mensaje = sentencia.var(cx_Oracle.STRING)
+                sentencia.callproc("BORRAR_CIUDAD", (ID_CIUDAD,resultado, mensaje))
+                sentencia.close()
+                if resultado.getvalue() == "TRUE":
+                    flash(mensaje.getvalue(), "success")
+                else:
+                    flash(mensaje.getvalue(), "danger")
+                    return redirect(url_for("ciudad"))
+            else:
+                flash("No se pudo realizar la conexion", "danger")
+            return redirect(url_for("ciudad"))
+        else:
+            return redirect(url_for("ciudad"))
+
+@app.route("/mostrar_pais")
+def mostrar_paises():
+        if request.method == "GET":
+            conexion = conectar_bdd("AVIONES","AVIONES")
+            if conexion != False:
+                sentencia = conexion.cursor()
+                sentencia.prepare("SELECT ID_PAIS,NOMBRE FROM PAIS")
+                sentencia.execute(None)
+                paises = []
+                for fila in sentencia: #Para ver cada fila, hay que recorrer la lista una por una
+                    paises.append(fila)      #Imprimimos cada fila
+                sentencia.close()  #Cerramos la conexión
+                return render_template("mostrar_paises.html", paises = paises)
+            else:
+                flash("No se pudo realizar la conexion", "danger")
+                return redirect(url_for("mostrar_paises"))
+        else:
+            return render_template("mostrar_paises.html")
+
+@app.route('/ingresar_pais', methods=['POST','GET'])
+def ingresar_pais():
+    if request.method == 'POST':
+        PAIS= dict()
+        PAIS['ID_PAIS'] = request.form['id']
+        PAIS['NOMBRE'] = request.form['nombre_p']
+        conexion = conectar_bdd("AVIONES","AVIONES")
+        if conexion != False:
+            sentencia = conexion.cursor()
+            resultado = sentencia.var(cx_Oracle.STRING)
+            mensaje = sentencia.var(cx_Oracle.STRING)
+            sentencia.callproc('INSERTAR_PAIS',(PAIS['ID_PAIS'],PAIS['NOMBRE'],resultado,mensaje))
+            sentencia.close()
+            if resultado.getvalue() == 'TRUE':
+                flash(mensaje.getvalue(),'success')
+            else:
+                flash(mensaje.getvalue(),'danger')
+        else:
+            flash('No fue posible conectarse a la base de datos','danger')
+        return redirect(url_for('ingresar_pais'))
+    else:
+        return render_template('ingresar_pais.html')
+
+@app.route("/actualizar_pais", methods=["POST","GET"]) 
+def actualizar_pais():
+    if request.method == "POST":
+        PAIS = dict()
+        PAIS['ID_PAIS'] = request.form['id']
+        PAIS['NOMBRE'] = request.form['nombre_p']
+        conexion = conectar_bdd("AVIONES","AVIONES")
+        if conexion != False:
+            sentencia = conexion.cursor()
+            resultado = sentencia.var(cx_Oracle.STRING) 
+            mensaje = sentencia.var(cx_Oracle.STRING)
+            TIPO = sentencia.var(cx_Oracle.STRING)
+            sentencia.callproc("ACTUALIZAR_PAIS",(PAIS['ID_PAIS'],PAIS['NOMBRE'],resultado,mensaje))
+            sentencia.close()
+            if resultado.getvalue() == 'TRUE':
+                flash(mensaje.getvalue(),'success')
+            else:
+                flash(mensaje.getvalue(),'danger')
+        else:
+            flash("No se pudo realizar la conexion", "danger")
+        return redirect(url_for("actualizar_pais"))
+    else:
+        return render_template("actualizar_pais.html")
+
+@app.route("/eliminar_pais", methods=["POST","GET"]) #vista modificar CLIENTE
+def eliminar_pais():
+        if request.method == "POST":
+            ID_PAIS = request.form["eliminar_pais"]
+            conexion = conectar_bdd("AVIONES","AVIONES")
+            if conexion != False:
+                sentencia = conexion.cursor()
+                resultado = sentencia.var(cx_Oracle.STRING) 
+                mensaje = sentencia.var(cx_Oracle.STRING)
+                sentencia.callproc("BORRAR_PAIS", (ID_PAIS,resultado, mensaje))
+                sentencia.close()
+                if resultado.getvalue() == "TRUE":
+                    flash(mensaje.getvalue(), "success")
+                else:
+                    flash(mensaje.getvalue(), "danger")
+                    return redirect(url_for("mostrar_paises"))
+            else:
+                flash("No se pudo realizar la conexion", "danger")
+            return redirect(url_for("mostrar_paises"))
+        else:
+            return redirect(url_for("mostrar_paises"))
+
+@app.route("/avion", methods=["POST","GET"]) #vista de los productos
+def avion():
+    if request.method == "GET":
+        conexion = conectar_bdd("AVIONES","AVIONES")
+        if conexion != False:
+            sentencia = conexion.cursor()
+            sentencia.prepare("SELECT ID_AVION,MODELO,CAPACIDAD,ANIO FROM AVION")
+            sentencia.execute(None)
+            aviones = []
+            for fila in sentencia: #Para ver cada fila, hay que recorrer la lista una por una
+                aviones.append(fila)      #Imprimimos cada fila
+            sentencia.close()  #Cerramos la conexión
+            return render_template("avion.html", aviones = aviones)
+        else:
+            flash("No se pudo realizar la conexion", "danger")
+            return redirect(url_for("avion"))
+    else:
+        return render_template("avion.html")
+
+@app.route("/Insertar_Avion", methods=["POST","GET"]) #vista insertar Aeropuerto
+def insertar_avion():
+    if "CLIENTE" in session:
+        if request.method == "POST":
+            AVION = dict()
+            AVION["ID_AVION"] = request.form["cod_avion"]
+            AVION["MODELO"] = request.form["modelo"]
+            AVION["CAPACIDAD"] = request.form["capacidad"]
+            AVION["ANIO"] = request.form["ano"]
+            conexion = conectar_bdd("AVIONES","AVIONES")
+            if conexion != False:
+                sentencia = conexion.cursor()
+                resultado = sentencia.var(cx_Oracle.STRING) 
+                mensaje = sentencia.var(cx_Oracle.STRING)
+                sentencia.callproc("INGRESAR_AVION", (AVION["ID_AVION"],AVION["MODELO"],AVION["CAPACIDAD"],AVION["ANIO"], resultado, mensaje))
+                sentencia.close()
+                if resultado.getvalue() == "TRUE":
+                    flash(mensaje.getvalue(), "success")
+                else:
+                    flash(mensaje.getvalue(), "danger")
+                    return redirect(url_for("insertar_avion"))
+            else:
+                flash("No se pudo realizar la conexion", "danger")
+            return redirect(url_for("avion"))
+        else:
+            return render_template("insertar_avion.html")
+    else:
+        return redirect(url_for("avion"))
+
+@app.route("/modificar_avion", methods=["POST","GET"]) #vista modificar Aeropuerto
+def modificar_avion():
+    if "CLIENTE" in session:
+        if request.method == "POST":
+            conexion = conectar_bdd("AVIONES","AVIONES")
+            codigo = request.form["modificar_avion"]
+            print(codigo)
+            print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+            sentencia = conexion.cursor()
+            sentencia.prepare("SELECT ID_AVION,MODELO,CAPACIDAD,ANIO FROM AVION WHERE ID_AVION = :codigo")
+            sentencia.execute(None, {'codigo': codigo})
+            avion = None
+            for fila in sentencia:
+                avion = fila
+            return render_template("modificar_avion.html", avion = avion)
+        else:
+            return render_template("modificar_avion.html")
+    else:
+        return redirect(url_for("avion"))
+
+@app.route("/guardar_modificar_avion", methods=["POST","GET"]) #vista modificar producto
+def guardar_modificar_avion():
+    if "CLIENTE" in session:
+        if request.method == "POST":
+            AVION = dict()
+            AVION["ID_AVION"] = request.form["cod_avion"]
+            AVION["MODELO"] = request.form["modelo"]
+            AVION["CAPACIDAD"] = request.form["capacidad"]
+            AVION["ANIO"] = request.form["ano"]
+            conexion = conectar_bdd("AVIONES","AVIONES")
+            if conexion != False:
+                sentencia = conexion.cursor()
+                resultado = sentencia.var(cx_Oracle.STRING) 
+                mensaje = sentencia.var(cx_Oracle.STRING)
+                sentencia.callproc("ACTUALIZAR_AVION", (AVION["ID_AVION"],AVION["MODELO"],AVION["CAPACIDAD"],AVION["ANIO"], resultado, mensaje))
+                sentencia.close()
+                if resultado.getvalue() == "TRUE":
+                    flash(mensaje.getvalue(), "success")
+                else:
+                    flash(mensaje.getvalue(), "danger")
+                    return redirect(url_for("avion"))
+            else:
+                flash("No se pudo realizar la conexion", "danger")
+            return redirect(url_for("avion"))
+        else:
+            return redirect({url_for("avion")})
+    else:
+        return redirect(url_for("inicio_sesion"))
+
+@app.route("/eliminar_avion", methods=["POST","GET"]) #vista modificar AEROPUERTO
+def eliminar_avion():
+    if "CLIENTE" in session:
+        if request.method == "POST":
+            ID_AVION = request.form["eliminar_avion"]
+            conexion = conectar_bdd("AVIONES","AVIONES")
+            if conexion != False:
+                sentencia = conexion.cursor()
+                resultado = sentencia.var(cx_Oracle.STRING) 
+                mensaje = sentencia.var(cx_Oracle.STRING)
+                sentencia.callproc("BORRAR_AVION", (ID_AVION, resultado, mensaje))
+                sentencia.close()
+                if resultado.getvalue() == "TRUE":
+                    flash(mensaje.getvalue(), "success")
+                else:
+                    flash(mensaje.getvalue(), "danger")
+                    return redirect(url_for("avion"))
+            else:
+                flash("No se pudo realizar la conexion", "danger")
+            return redirect(url_for("avion"))
+        else:
+            return redirect(url_for("avion"))
+    else:
+        return redirect(url_for("avion"))
+
+
+
+
+
+
+
+
+
+
+
 
 def conectar_bdd(user,passw):
     try:    

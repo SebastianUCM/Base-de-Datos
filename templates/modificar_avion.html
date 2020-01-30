@@ -1,31 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Vista Administrador Vuelo</title>
+    <title>Vista de inicio</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
     <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
-  </head>
+</head>
 
-  <body>
+<body>
     <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm">
         <h5 class="my-0 mr-md-auto font-weight-normal"><a href="{{ url_for('inicio') }}">Compañía</a></h5>
         
-         {% if session["TIPO"] == "ADMIN" %}
+        {% if session["TIPO"] == "ADMIN" %}
         <nav class="my-2 my-md-0 mr-md-3">
-            <a class="p-2 text-dark" href="{{ url_for('administra_vuelo') }}">Administra Vuelo</a>
+            <a class="p-2 text-dark" href="{{ url_for('avion') }}">Avion</a>
         </nav>  
-
         {% endif %}
+
         {% if not session["CLIENTE"] %}
-        <a class="btn btn-outline-primary" href="{{ url_for('registro') }}">Registrarse</a>
+        <a class="btn btn-outline-primary" href="{{ url_for('inicio') }}">Registrarse</a>
         {% endif %}
-
         {% if session["CLIENTE"] %}
         <a class="btn btn-outline-danger" style="margin-left: 10px;" href="{{ url_for('cerrar_sesion') }}">Cerrar Sesión</a>
         {% else %}
@@ -34,11 +34,10 @@
     </div>
 
     <div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
-        <h1 class="display-4">Avión</h1>
+        <h1 class="display-4">Modificar Avion</h1>
     </div>
 
-
-    {% if session["CLIENTE"] %}
+    {% if session["TIPO"] == "ADMIN" %}
     <div class="container">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
@@ -51,51 +50,34 @@
               {% endfor %}
             {% endif %}
         {% endwith %}
-            {% if aviones|length > 0 %}
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th scope="col">ID AVION</th>
-                        <th scope="col">MODELO</th>
-                        <th scope="col">CAPACIDAD</th>
-                        <th scope="col">AÑO</th>
-                        <th scope="col">ACCIÓN</th>
-                    </tr>
-                </thead>
+        <form action="{{ url_for('guardar_modificar_avion') }}" method="POST">
+            <!-- --> 
+            <div class="form-group">
+                <label for="cod_avion">Id Avión</label>
+                <input type="text" class="form-control" name="cod_avion" id="cod_avion" value = "{{ avion[0] }}" placeholder="Ingrese el código del avion" readonly>
+            </div>
+            <!-- --> 
+            <div class="form-group">
+                <label for="modelo">Modelo Avión</label>
+                <input type="text" class="form-control" name="modelo" id="modelo" value = "{{ avion[1] }}" placeholder="Ingrese el modelo del avion" required>
+            </div>
+            <!-- --> 
+            <div class="form-group">
+                <label for="capacidad">Capacidad</label>
+                <input type="text" class="form-control" name="capacidad" id="capacidad" value = "{{ avion[2] }}" placeholder="Ingrese la capacidad del aeropuerto" readonly>
+            </div>
+            <!-- --> 
+             <div class="form-group">
+                <label for="ano">Año del Avión ejemplo(1993)</label>
+                <input type="text" class="form-control" name="ano" id="ano" placeholder="Ingrese el año del avión ejemplo(1993) ">
+            </div>
+            <!-- --> 
+            <button type="submit" class="btn btn-primary">Guardar</button>
+        </form>
+        {% endif %}
 
-                <tbody>
-                    {% for avion in aviones %}
-                    <tr>
-                        <td>{{ avion[0] }}</td>
-                        <td>{{ avion[1] }}</td>
-                        <td>{{ avion[2] }}</td>
-                        <td>{{ avion[3] }}</td>
-                        <td>
-                          <!-- Boton Modificar  -->
-                          <form action="modificar_avion" method="POST">
-                            <button class="btn btn-success btn-block" type="submit" name="modificar_avion" id="modificar_avion" value="{{ avion[0] }}">Modificar</button>
-                          </form> 
-                          <!-- Boton Eliminar  -->
-                          <form action="eliminar_avion" method="POST">
-                            <button class="btn btn-danger btn-block" type="submit" name="eliminar_avion" id="eliminar_avion" value="{{ avion[0] }}">Eliminar</button>
-                          </form> 
 
-                        </td>
-                      </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            {% else %}
-                <div class="alert alert-info"> <strong>¡Atención!</strong> Al parecer aún no se ha ingresado ningún Avion</div>
-            {% endif %}
-        </div>
-    {% endif %}
-<div class="container">    
-    {% if session["CLIENTE"] %}
-      <a type="button" class="btn btn-success" href="{{ url_for('insertar_avion') }}">Agregar avion</a>
-    {% endif %}
-    </div>
-      <div class="container">
+
         <footer class="pt-4 my-md-5 pt-md-5 border-top">
             <div class="row">
                 <div class="col-12 col-md">
@@ -104,6 +86,7 @@
                 </div>                
             </div>
         </footer>
+
     </div>
 </body>
 
