@@ -18,10 +18,10 @@
         
          {% if session["TIPO"] == "ADMIN" %}
         <nav class="my-2 my-md-0 mr-md-3">
-            <a class="p-2 text-dark" href="#">Origen</a>
+            <a class="p-2 text-dark" href="{{url_for('origen')}}">Origen</a>
         </nav>  
         <nav class="my-2 my-md-0 mr-md-3">
-            <a class="p-2 text-dark" href="#">Destino</a>
+            <a class="p-2 text-dark" href="{{url_for('destino')}}">Destino</a>
         </nav>  
         </nav> 
         <nav class="my-2 my-md-0 mr-md-3">
@@ -50,6 +50,77 @@
     <div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
         <h1 class="display-4">Administra Itinerario</h1>
     </div>
+<!---->
+    {% if session["CLIENTE"] %}
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+              {% for category, message in messages %}
+                {% if category == "success" %}
+                <div class="alert alert-success"> <strong>¡Excelente!</strong> {{ message }}</div>
+                {% else %}
+                <div class="alert alert-danger"> <strong>¡Oh rayos!</strong> {{ message }}</div>
+                {% endif %}
+              {% endfor %}
+            {% endif %}
+        {% endwith %}
+            {% if itinerarios|length > 0 %}
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">HORA LLEGADA</th>
+                        <th scope="col">HORA SALIDA</th>
+                        <th scope="col">FECHA LLEGADA</th>
+                        <th scope="col">FECHA SALIDA</th>
+                        <th scope="col">ORIGEN</th>
+                        <th scope="col">DESTINO</th>
+                        <th scope="col">ACCIÓN</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for itinerario in itinerarios %}
+                    <tr>
+                        <td>{{ itinerario[0] }}</td>
+                        <td>{{ itinerario[1] }}</td>
+                        <td>{{ itinerario[2] }}</td>
+                        <td>{{ itinerario[3] }}</td>
+                        <td>{{ itinerario[4] }}</td>
+                        <td>{{ itinerario[5] }}</td>
+                        <td>{{ itinerario[6] }}</td>
+                        <td>{{ itinerario[7] }}</td>
+                        <td>
+                          <!-- Boton Modificar  -->
+                          <!--
+                          <form action="modificar_aeropuerto" method="POST">
+                            <button class="btn btn-success btn-block" type="submit" name="modificar_aeropuerto" id="modificar_aeropuerto" value="{{ aeropuerto[0] }}">Modificar</button>
+                          </form>
+                          --> 
+                          <!-- Boton Eliminar  -->
+                          <!--
+                          <form action="eliminar_aeropuerto" method="POST">
+                            <button class="btn btn-danger btn-block" type="submit" name="eliminar_aeropuerto" id="eliminar_aeropuerto" value="{{ aeropuerto[0] }}">Eliminar</button>
+                          </form> 
+                        -->
+                        </td>
+                      </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+                <div class="alert alert-info"> <strong>¡Atención!</strong> Al parecer aún no se ha ingresado ningún Itinerario</div>
+            {% endif %}
+        </div>
+    {% endif %}
+    
+    <div class="container">    
+    {% if session["CLIENTE"] %}
+      <a type="button" class="btn btn-success" href="{{ url_for('insertar_itinerario') }}">Agregar Itinerario</a>
+    {% endif %}
+    
+
+<!---->
 
     <div class="container">
         <footer class="pt-4 my-md-5 pt-md-5 border-top">

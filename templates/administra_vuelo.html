@@ -4,18 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Vista Administación Aviones</title>
+    <title>Vista Administrador Vuelos</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
     <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
   </head>
 
   <body>
     <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm">
         <h5 class="my-0 mr-md-auto font-weight-normal"><a href="{{ url_for('inicio') }}">Compañía</a></h5>
-
+        
+         {% if session["TIPO"] == "ADMIN" %}
+        <nav class="my-2 my-md-0 mr-md-3">
+            <a class="p-2 text-dark" href="{{url_for('origen')}}">Avión</a>
+        </nav>  
+        <nav class="my-2 my-md-0 mr-md-3">
+            <a class="p-2 text-dark" href="{{url_for('destino')}}">Vuelo</a>
+        </nav>  
+        {% endif %}
         {% if not session["CLIENTE"] %}
         <a class="btn btn-outline-primary" href="{{ url_for('registro') }}">Registrarse</a>
         {% endif %}
+
         {% if session["CLIENTE"] %}
         <a class="btn btn-outline-danger" style="margin-left: 10px;" href="{{ url_for('cerrar_sesion') }}">Cerrar Sesión</a>
         {% else %}
@@ -23,55 +35,9 @@
         {% endif %}
     </div>
 
-
     <div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
         <h1 class="display-4">Administra Vuelos</h1>
-        {% if session["CLIENTE"]%}
-            {% if session["TIPO"] == "ADMIN" %}
-                <p class="lead">ADMINISTRADOR</p>
-            {% else %}
-                {% if session["TIPO"] == "NORMAL" %}
-                    <p class="lead">USUARIO NORMAL</p>
-                {% else %}
-                    <p class="lead">VISITANTE</p>
-                {% endif %}    
-            {% endif %}
-        {% endif %}
     </div>
-
-    <form action="{{ url_for('administra_vuelo') }}" method="POST">
-        <div class="form-group">
-            <label for="codigo_producto">Código producto</label>
-            <input type="number" class="form-control" name="codigo_producto" id="codigo_producto" placeholder="Ingrese el código del producto">
-        </div>
-        <div class="form-group">
-            <label for="nombre_producto">Nombre producto</label>
-            <input type="text" class="form-control" name="nombre_producto" id="nombre_producto" placeholder="Ingrese el nombre del producto">
-        </div>
-        <div class="form-group">
-            <label for="precio_producto">Precio</label>
-            <input type="number" class="form-control" name="precio_producto" id="precio_producto" placeholder="Ingrese el precio del producto">
-        </div>
-        <div class="form-group">
-                <label for="categoria_producto">Categoría</label>
-                <select class="form-control" name="categoria_producto" id="categoria_producto">
-                    <option value="">Seleccione una categoría</option>
-                    {% for fila in categorias %}
-                        <option value="{{ fila[0] }}">{{ fila[1] }}</option>
-                    <!-- Cargar categorías disponibles desde la base de datos -->
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="stock_producto">Stock</label>
-                <input type="number" class="form-control" name="stock_producto" id="stock_producto" placeholder="Ingrese el stock del producto">
-            </div>
-            {% if categorias|length > 0 %}
-                <button type="submit" class="btn btn-primary">Guardar</button>
-            {% else %}
-                <button type="submit" class="btn btn-primary" disabled>Guardar</button>
-            {% endif %}
-        </form>
 
     <div class="container">
         <footer class="pt-4 my-md-5 pt-md-5 border-top">
