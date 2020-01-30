@@ -53,31 +53,31 @@
             </div>
 
             <div class="form-group">
-                <label for="hora_llegada_a">HORA LLEGADA</label>
+                <label for="hora_llegada_a">Hora Llegada</label>
                 <input type="text" class="form-control" name="hora_llegada_a" id="hora_llegada_a" placeholder="Ingrese el nombre del producto">
             </div>
 
             <div class="form-group">
-                <label for="hora_salida_a">HORA SALIDA</label>
+                <label for="hora_salida_a">Hora SALIDA</label>
                 <input type="text" class="form-control" name="hora_salida_a" id="hora_salida_a" placeholder="Ingrese el precio del producto">
             </div>
 
             <div class="form-group">
-                <label for="fecha_llegada_a">FECHA LLEGADA</label>
+                <label for="fecha_llegada_a">Fecha Llegada</label>
                 <input type="text" class="form-control" name="fecha_llegada_a" id="fecha_llegada_a" placeholder="Ingrese el precio del producto">
             </div>
 
             <div class="form-group">
-                <label for="fecha_salida_a">FECHA SALIDA</label>
+                <label for="fecha_salida_a">Fecha Salida</label>
                 <input type="text" class="form-control" name="fecha_salida_a" id="fecha_salida_a" placeholder="Ingrese el código del Aerpuerto">
             </div>
 
             <div class="form-group">
                 <label for="origen_a">ORIGEN</label>
                 <select class="form-control" name="origen_a" id="origen_a">
-                    <option value="">Seleccione Ciudad Destino</option>
-                    {% for fila in ciudades_o %}
-                        <option value="{{ elem[0] }}">{{ elem[1] }}</option>
+                    <option value="">Seleccione Ciudad Origen</option>
+                    {% for fila in origenes %}
+                        <option value="{{ fila[0] }}">{{ fila[0] }}</option>
                     <!-- Cargar categorías disponibles desde la base de datos -->
                     {% endfor %}
                 </select>
@@ -87,14 +87,14 @@
                 <label for="destino_a">DESTINO</label>
                 <select class="form-control" name="destino_a" id="destino_a">
                     <option value="">Seleccione Ciudad Destino</option>
-                    {% for fila in ciudades_d %}
-                        <option value="{{ fila[0] }}">{{ fila[1] }}</option>
+                    {% for elem in destinos %}
+                        <option value="{{ elem[0] }}">{{ elem[0] }}</option>
                     <!-- Cargar categorías disponibles desde la base de datos -->
                     {% endfor %}
                 </select>
             </div>
 
-            {% if itinerarios|length > 0 %}
+            {% if origenes|length > 0 and destinos|length > 0 %}
                 <button type="submit" class="btn btn-primary">Guardar</button>
             {% else %}
                 <button type="submit" class="btn btn-primary" disabled>Guardar</button>

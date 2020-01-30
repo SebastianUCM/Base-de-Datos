@@ -306,7 +306,7 @@ def insertar_itinerario():
                 resultado = sentencia.var(cx_Oracle.STRING) 
                 mensaje = sentencia.var(cx_Oracle.STRING)
                 rut_usuario = session["usuario"]
-                sentencia.callproc("INGRESAR_ITINERARIO", (ITINERARIO["ID_ITINERARIO"],ITINERARIO["HORA_LLEGADA"],ITINERARIO["HORA_SALIDA"],ITINERARIO["FECHA_LLEGADA"],ITINERARIO["ORIGEN"],ITINERARIO["DESTINO"], resultado, mensaje))
+                sentencia.callproc("INGRESAR_ITINERARIO", (ITINERARIO["ID_ITINERARIO"],ITINERARIO["HORA_LLEGADA"],ITINERARIO["HORA_SALIDA"],ITINERARIO["FECHA_LLEGADA"],ITINERARIO["FECHA_SALIDA"],ITINERARIO["ORIGEN"],ITINERARIO["DESTINO"], resultado, mensaje))
                 sentencia.close()
                 if resultado.getvalue() == "TRUE":
                     flash(mensaje.getvalue(), "success")
@@ -319,20 +319,48 @@ def insertar_itinerario():
         else:
             conexion = conectar_bdd("AVIONES","AVIONES")
             sentencia = conexion.cursor()
-            sentencia.prepare("SELECT O.ID_ORIGEN, O.AEROPUERTO, A.NOMBRE, C.NOMBRE, P.NOMBRE FROM AEROPUERTO A, CIUDAD C,PAIS P, ORIGEN O WHERE O.AEROPUERTO = A.ID_AEROPUERTO AND P.ID_PAIS = C.PAIS AND C.ID_CIUDAD = A.CIUDAD") 
-            ciudades_o = []
-            for elem in sentencia:
-                ciudades_o.append(elem)
-            sentencia.close()
-            sentencia = conexion.cursor()
-            sentencia.prepare("SELECT D.ID_DESTINO, D.AEROPUERTO, A.NOMBRE, C.NOMBRE, P.NOMBRE FROM AEROPUERTO A, CIUDAD C,PAIS P, DESTINO D WHERE D.AEROPUERTO = A.ID_AEROPUERTO AND P.ID_PAIS = C.PAIS AND C.ID_CIUDAD = A.CIUDAD")
-            ciudades_d = []
+            sentencia_1 = conexion.cursor()
+            sentencia.prepare("SELECT ID_DESTINO FROM DESTINO ")
+            sentencia.execute(None)
+            destinos = []
+            sentencia_1.prepare("SELECT ID_ORIGEN FROM ORIGEN")
+            sentencia_1.execute(None)
+            origenes = []
             for fila in sentencia:
-                ciudades_d.append(fila)
-            sentencia.close()            
-            return render_template("insertar_itinerario.html", ciudades_o = ciudades_o, ciudades_d = ciudades_d)
+                destinos.append(fila)
+            sentencia.close()
+            for elem in sentencia_1:
+                origenes.append(elem)
+            sentencia_1.close()
+            return render_template("insertar_itinerario.html", destinos = destinos, origenes=origenes)
+    else:
+        return redirect(url_for("insertar_itinerario"))
+
+@app.route("/eliminar_itinerario", methods=["POST","GET"]) #vista modificar itinerario
+def eliminar_itinerario():
+    if "CLIENTE" in session:
+        if request.method == "POST":
+            codigo = request.form["eliminar_itinerario"]
+            conexion = conectar_bdd("AVIONES","AVIONES")
+            if conexion != False:
+                sentencia = conexion.cursor()
+                resultado = sentencia.var(cx_Oracle.STRING) 
+                mensaje = sentencia.var(cx_Oracle.STRING)
+                sentencia.callproc("BORRAR_ITINERARIO", (codigo, resultado, mensaje))
+                sentencia.close()
+                if resultado.getvalue() == "TRUE":
+                    flash(mensaje.getvalue(), "success")
+                else:
+                    flash(mensaje.getvalue(), "danger")
+                    return redirect(url_for("administra_itinerario"))
+            else:
+                flash("No se pudo realizar la conexion", "danger")
+            return redirect(url_for("administra_itinerario"))
+        else:
+            return redirect(url_for("administra_itinerario"))
     else:
         return redirect(url_for("administra_itinerario"))
+
 
 @app.route("/modificar_aeropuerto", methods=["POST","GET"]) #vista modificar Aeropuerto
 def modificar_aeropuerto():

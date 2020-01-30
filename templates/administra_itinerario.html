@@ -69,10 +69,10 @@
                 <thead>
                     <tr>
                         <th scope="col">ID</th>
-                        <th scope="col">HORA LLEGADA</th>
                         <th scope="col">HORA SALIDA</th>
-                        <th scope="col">FECHA LLEGADA</th>
+                        <th scope="col">HORA LLEGADA</th>
                         <th scope="col">FECHA SALIDA</th>
+                        <th scope="col">FECHA LLEGADA</th>
                         <th scope="col">ORIGEN</th>
                         <th scope="col">DESTINO</th>
                         <th scope="col">ACCIÓN</th>
@@ -83,26 +83,18 @@
                     {% for itinerario in itinerarios %}
                     <tr>
                         <td>{{ itinerario[0] }}</td>
-                        <td>{{ itinerario[1] }}</td>
                         <td>{{ itinerario[2] }}</td>
-                        <td>{{ itinerario[3] }}</td>
+                        <td>{{ itinerario[1] }}</td>
                         <td>{{ itinerario[4] }}</td>
+                        <td>{{ itinerario[3] }}</td>
                         <td>{{ itinerario[5] }}</td>
                         <td>{{ itinerario[6] }}</td>
-                        <td>{{ itinerario[7] }}</td>
                         <td>
-                          <!-- Boton Modificar  -->
-                          <!--
-                          <form action="modificar_aeropuerto" method="POST">
-                            <button class="btn btn-success btn-block" type="submit" name="modificar_aeropuerto" id="modificar_aeropuerto" value="{{ aeropuerto[0] }}">Modificar</button>
-                          </form>
-                          --> 
-                          <!-- Boton Eliminar  -->
-                          <!--
-                          <form action="eliminar_aeropuerto" method="POST">
-                            <button class="btn btn-danger btn-block" type="submit" name="eliminar_aeropuerto" id="eliminar_aeropuerto" value="{{ aeropuerto[0] }}">Eliminar</button>
+                        <!-- Boton Eliminar  -->
+                          <form action="eliminar_itinerario" method="POST">
+                            <button class="btn btn-danger btn-block" type="submit" name="eliminar_itinerario" id="eliminar_itinerario" value="{{ itinerario[0] }}">Eliminar</button>
                           </form> 
-                        -->
+
                         </td>
                       </tr>
                     {% endfor %}
