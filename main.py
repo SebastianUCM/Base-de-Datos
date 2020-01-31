@@ -87,7 +87,7 @@ def perfil():
             resultado = sentencia.var(cx_Oracle.STRING) 
             mensaje = sentencia.var(cx_Oracle.STRING)
             TIPO = sentencia.var(cx_Oracle.STRING)
-            sentencia.callproc("AVIONES.ACTUALIZA_CLIENTE",(CLIENTE["NOMBRE"], CLIENTE["APELLIDO"], CLIENTE["FECHA_NACIMIENTO"], CLIENTE["GENERO"], CLIENTE["TIPO_DOCUMENTO"], CLIENTE["FECHA_VENCIMIENTO_DOCUMENTO"], CLIENTE["NUMERO_DOCUMENTO"], CLIENTE["NACIONALIDAD"], CLIENTE["PAIS"], CLIENTE["TELEFONO"], CLIENTE["EMAIL"], CLIENTE["CONTRASENA"], resultado, mensaje))
+            sentencia.callproc("ACTUALIZA_CLIENTE",(CLIENTE["NOMBRE"], CLIENTE["APELLIDO"], CLIENTE["FECHA_NACIMIENTO"], CLIENTE["GENERO"], CLIENTE["TIPO_DOCUMENTO"], CLIENTE["FECHA_VENCIMIENTO_DOCUMENTO"], CLIENTE["NUMERO_DOCUMENTO"], CLIENTE["NACIONALIDAD"], CLIENTE["PAIS"], CLIENTE["TELEFONO"], CLIENTE["EMAIL"], CLIENTE["CONTRASENA"], resultado, mensaje))
             sentencia.close()
             if resultado.getvalue() == "TRUE":
                 session["CLIENTE"] = CLIENTE["EMAIL"]
@@ -790,11 +790,146 @@ def eliminar_avion():
     else:
         return redirect(url_for("avion"))
 
+@app.route("/Vuelo", methods=["POST","GET"])#vista de los productos
+def vuelo():
+    if request.method == "GET":
+        conexion = conectar_bdd("AVIONES","AVIONES")
+        if conexion != False:
+            sentencia = conexion.cursor()
+            sentencia.prepare("SELECT * FROM VUELO")
+            sentencia.execute(None)
+            vuelos = []
+            for fila in sentencia: #Para ver cada fila, hay que recorrer la lista una por una
+                vuelos.append(fila)      #Imprimimos cada fila
+            sentencia.close()  #Cerramos la conexión
+            return render_template("vuelo.html", vuelos = vuelos)
+        else:
+            flash("No se pudo realizar la conexion", "danger")
+            return redirect(url_for("vuelo"))
+    else:
+        return render_template("vuelo.html")
+
+@app.route("/insertar_vuelo", methods=["POST","GET"]) #vista insertar producto
+def insertar_vuelo():
+    if "CLIENTE" in session:
+        if request.method == "POST":
+            VUELO = dict()
+            VUELO["ID_VUELO"] = request.form["ins_id_vuelo"]
+            VUELO["CAPACIDAD"] = request.form["ins_capacidad"]
+            VUELO["NUMERO_VUELO"] = request.form["ins_numero_vuelo"]
+            VUELO["AVION"] = request.form["ins_avion"]
+            VUELO["ITINERARIO"] = request.form["ins_itinerario"]
+            conexion = conectar_bdd("AVIONES","AVIONES")
+            if conexion != False:
+                sentencia = conexion.cursor()
+                resultado = sentencia.var(cx_Oracle.STRING) 
+                mensaje = sentencia.var(cx_Oracle.STRING)
+                sentencia.callproc("INSERTAR_VUELO", (VUELO["ID_VUELO"],VUELO["CAPACIDAD"],VUELO["NUMERO_VUELO"],VUELO["AVION"], VUELO["ITINERARIO"],resultado, mensaje))
+                sentencia.close()
+                if resultado.getvalue() == "TRUE":
+                    flash(mensaje.getvalue(), "success")
+                else:
+                    flash(mensaje.getvalue(), "danger")
+                    return redirect(url_for("insertar_vuelo"))
+            else:
+                flash("No se pudo realizar la conexion", "danger")
+            return redirect(url_for("vuelo"))
+        else:
+            conexion = conectar_bdd("AVIONES","AVIONES")
+            sentencia = conexion.cursor()
+            sentencia_1 = conexion.cursor()
+            sentencia.prepare("SELECT * FROM AVION ")
+            sentencia.execute(None)
+            aviones= []
+            sentencia_1.prepare("SELECT * FROM ITINERARIO")
+            sentencia_1.execute(None)
+            itinerarios = []
+            for fila in sentencia:
+                aviones.append(fila)
+            sentencia.close()
+            for elem in sentencia_1:
+                itinerarios.append(elem)
+            sentencia_1.close()
+            return render_template("insertar_vuelo.html", aviones = aviones, itinerarios=itinerarios)
+    else:
+        return redirect(url_for("vuelo"))
 
 
+@app.route("/modificar_vuelo", methods=["POST","GET"]) #vista modificar Aeropuerto
+def modificar_vuelo():
+    if "CLIENTE" in session:
+        if request.method == "POST":
+            conexion = conectar_bdd("AVIONES","AVIONES")
+            codigo = request.form["modificar_vuelo"]
+            print(codigo)
+            print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+            sentencia = conexion.cursor()
+            sentencia.prepare("SELECT ID_VUELO, CAPACIDAD,NUMERO_VUELO,AVION,ITINERARIO FROM VUELO WHERE ID_VUELO = :codigo")
+            sentencia.execute(None, {'codigo': codigo})
+            vuelos = None
+            for fila in sentencia:
+                vuelos= fila
+            return render_template("modificar_vuelo.html", vuelos = vuelos)
+        else:
+            return render_template("modificar_vuelo.html")
+    else:
+        return redirect(url_for("vuelo"))
+
+@app.route("/guardar_modificar_vuelo", methods=["POST","GET"]) #vista modificar producto
+def guardar_modificar_vuelo():
+    if "CLIENTE" in session:
+        if request.method == "POST":
+            VUELO = dict()
+            VUELO["ID_VUELO"] = request.form["id_vuelo"]
+            VUELO["CAPACIDAD"] = request.form["capacidad"]
+            VUELO["NUMERO_VUELO"] = request.form["num_vuelo"]
+            VUELO["AVION"] = request.form["nombre_avion"]
+            VUELO["ITINERARIO"] = request.form["itinerario"]
+            conexion = conectar_bdd("AVIONES","AVIONES")
+            if conexion != False:
+                sentencia = conexion.cursor()
+                resultado = sentencia.var(cx_Oracle.STRING) 
+                mensaje = sentencia.var(cx_Oracle.STRING)
+                sentencia.callproc("ACTUALIZAR_VUELO", (VUELO["ID_VUELO"],VUELO["CAPACIDAD"],VUELO["NUMERO_VUELO"],VUELO["AVION"], VUELO["ITINERARIO"],resultado, mensaje))
+                sentencia.close()
+                if resultado.getvalue() == "TRUE":
+                    flash(mensaje.getvalue(), "success")
+                else:
+                    flash(mensaje.getvalue(), "danger")
+                    return redirect(url_for("vuelo"))
+            else:
+                flash("No se pudo realizar la conexion", "danger")
+            return redirect(url_for("vuelo"))
+        else:
+            return redirect({url_for("vuelo")})
+    else:
+        return redirect(url_for("inicio_sesion"))
 
 
-
+@app.route("/eliminar_vuelo", methods=["POST","GET"]) #vista modificar itinerario
+def eliminar_vuelo():
+    if "CLIENTE" in session:
+        if request.method == "POST":
+            codigo = request.form["eliminar_vuelo"]
+            conexion = conectar_bdd("AVIONES","AVIONES")
+            if conexion != False:
+                sentencia = conexion.cursor()
+                resultado = sentencia.var(cx_Oracle.STRING) 
+                mensaje = sentencia.var(cx_Oracle.STRING)
+                sentencia.callproc("BORRAR_VUELO", (codigo, resultado, mensaje))
+                sentencia.close()
+                if resultado.getvalue() == "TRUE":
+                    flash(mensaje.getvalue(), "success")
+                else:
+                    flash(mensaje.getvalue(), "danger")
+                    return redirect(url_for("vuelo"))
+            else:
+                flash("No se pudo realizar la conexion", "danger")
+            return redirect(url_for("vuelo"))
+        else:
+            return redirect(url_for("vuelo"))
+    else:
+        return redirect(url_for("vuelo"))
 
 
 
