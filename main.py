@@ -816,15 +816,15 @@ def insertar_vuelo():
             VUELO = dict()
             VUELO["ID_VUELO"] = request.form["ins_id_vuelo"]
             VUELO["CAPACIDAD"] = request.form["ins_capacidad"]
-            VUELO["NUMERO_VUELO"] = request.form["ins_numero_vuelo"]
             VUELO["AVION"] = request.form["ins_avion"]
             VUELO["ITINERARIO"] = request.form["ins_itinerario"]
+            VUELO["VALOR"] = request.form["valor_vuelo"]
             conexion = conectar_bdd("AVIONES","AVIONES")
             if conexion != False:
                 sentencia = conexion.cursor()
                 resultado = sentencia.var(cx_Oracle.STRING) 
                 mensaje = sentencia.var(cx_Oracle.STRING)
-                sentencia.callproc("INSERTAR_VUELO", (VUELO["ID_VUELO"],VUELO["CAPACIDAD"],VUELO["NUMERO_VUELO"],VUELO["AVION"], VUELO["ITINERARIO"],resultado, mensaje))
+                sentencia.callproc("INSERTAR_VUELO", (VUELO["ID_VUELO"],VUELO["CAPACIDAD"],VUELO["AVION"], VUELO["ITINERARIO"],VUELO["VALOR"],resultado, mensaje))
                 sentencia.close()
                 if resultado.getvalue() == "TRUE":
                     flash(mensaje.getvalue(), "success")
@@ -864,7 +864,7 @@ def modificar_vuelo():
             print(codigo)
             print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
             sentencia = conexion.cursor()
-            sentencia.prepare("SELECT ID_VUELO, CAPACIDAD,NUMERO_VUELO,AVION,ITINERARIO FROM VUELO WHERE ID_VUELO = :codigo")
+            sentencia.prepare("SELECT ID_VUELO, CAPACIDAD,AVION,ITINERARIO,VALOR FROM VUELO WHERE ID_VUELO = :codigo")
             sentencia.execute(None, {'codigo': codigo})
             vuelos = None
             for fila in sentencia:
@@ -882,15 +882,15 @@ def guardar_modificar_vuelo():
             VUELO = dict()
             VUELO["ID_VUELO"] = request.form["id_vuelo"]
             VUELO["CAPACIDAD"] = request.form["capacidad"]
-            VUELO["NUMERO_VUELO"] = request.form["num_vuelo"]
             VUELO["AVION"] = request.form["nombre_avion"]
             VUELO["ITINERARIO"] = request.form["itinerario"]
+            VUELO["VALOR"] = request.form["valor_vuelo"]
             conexion = conectar_bdd("AVIONES","AVIONES")
             if conexion != False:
                 sentencia = conexion.cursor()
                 resultado = sentencia.var(cx_Oracle.STRING) 
                 mensaje = sentencia.var(cx_Oracle.STRING)
-                sentencia.callproc("ACTUALIZAR_VUELO", (VUELO["ID_VUELO"],VUELO["CAPACIDAD"],VUELO["NUMERO_VUELO"],VUELO["AVION"], VUELO["ITINERARIO"],resultado, mensaje))
+                sentencia.callproc("ACTUALIZAR_VUELO", (VUELO["ID_VUELO"],VUELO["CAPACIDAD"],VUELO["AVION"], VUELO["ITINERARIO"],VUELO["VALOR"],resultado, mensaje))
                 sentencia.close()
                 if resultado.getvalue() == "TRUE":
                     flash(mensaje.getvalue(), "success")

@@ -54,26 +54,26 @@
             <!-- --> 
             <div class="form-group">
                 <label for="id_vuelo">ID VUELO</label>
-                <input type="text" class="form-control" name="id_vuelo" id="id_vuelo" value = "{{ vuelos[0] }}" placeholder="Ingrese el código del vuelo">
+                <input type="text" class="form-control" name="id_vuelo" id="id_vuelo" value = "{{ vuelos[0] }}" placeholder="Ingrese el código del vuelo" readonly>
             </div>
             <!-- --> 
             <div class="form-group">
                 <label for="capacidad">CAPACIDAD</label>
-                <input type="number" class="form-control" name="capacidad" id="capacidad" value = "{{ vuelos[1] }}" placeholder="Ingrese la capacidad del vuelo">
+                <input type="number" class="form-control" name="capacidad" id="capacidad" value = "{{ vuelos[1] }}" placeholder="Ingrese la capacidad del vuelo" readonly>
             </div>
             <!-- --> 
-            <div class="form-group">
-                <label for="num_vuelo">NUMERO DEL VUELO</label>
-                <input type="text" class="form-control" name="num_vuelo" id="num_vuelo" value = "{{ vuelos[2] }}" placeholder="Ingrese el numero del VUELO">
-            </div>
             <!-- --> 
             <div class="form-group">
                 <label for="nombre_avion">AVION</label>
-                <input type="text" class="form-control" name="nombre_avion" id="nombre_avion" value = "{{ vuelos[3] }}">
+                <input type="text" class="form-control" name="nombre_avion" id="nombre_avion" value = "{{ vuelos[2] }}">
             </div>
             <div class="form-group">
                 <label for="itinerario">ITINERARIO</label>
-                <input type="text" class="form-control" name="itinerario" id="itinerario" value = "{{ vuelos[4] }}">
+                <input type="text" class="form-control" name="itinerario" id="itinerario" value = "{{ vuelos[3] }}" readonly>
+            </div>
+            <div class="form-group">
+                <label for="valor_vuelo">VALOR DEL VUELO</label>
+                <input type="number" class="form-control" name="valor_vuelo" id="valor_vuelo" value = "{{ vuelos[4] }}" placeholder="Ingrese el Valor del VUELO">
             </div>
 
             <!-- --> 

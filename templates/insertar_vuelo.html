@@ -54,10 +54,6 @@
                 <label for="ins_capacidad">ins_capacidad del Vuelo </label>
                 <input type="number" class="form-control" name="ins_capacidad" id="ins_capacidad" placeholder="Ingrese la capacidad del vuelo">
             </div>
-            <div class="form-group">
-                <label for="ins_numero_vuelo">Número del Vuelo </label>
-                <input type="text" class="form-control" name="ins_numero_vuelo" id="ins_numero_vuelo" placeholder="Ingrese el numero del vuelo">
-            </div>
 
             <div class="form-group">
                 <label for="ins_avion">Aviones</label>
@@ -79,6 +75,10 @@
                     <!-- Cargar categorías disponibles desde la base de datos -->
                     {% endfor %}
                 </select>
+            </div>
+            <div class="form-group">
+                <label for="valor_vuelo">ins_capacidad del Vuelo </label>
+                <input type="number" class="form-control" name="valor_vuelo" id="valor_vuelo" placeholder="Ingrese el valor del vuelo">
             </div>
 
             {% if aviones|length > 0 and itinerarios|length > 0%}
